@@ -12,7 +12,6 @@ const NAV_LINKS = [
   { to: "/contact", label: "Contact" },
 ];
 
-const EMAIL = process.env.REACT_APP_EMAIL || "you@example.com";
 const SOCIAL_LINKS = [
   { href: process.env.REACT_APP_SOCIAL_GITHUB || "https://github.com", icon: Github, label: "GitHub" },
   { href: process.env.REACT_APP_SOCIAL_LINKEDIN || "https://linkedin.com", icon: Linkedin, label: "LinkedIn" },
