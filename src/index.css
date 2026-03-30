@@ -7,13 +7,13 @@
 :root, [data-theme="dark"] {
   --primary: #06b6d4;
   --accent: #8b5cf6;
-  --bg: #050810;
-  --surface: #0a0f1a;
+  --bg: #010102;
+  --surface: #3a4c73;
   --card: #0f1525;
   --border: rgba(255,255,255,0.06);
   --text: #e8edf5;
-  --muted: #171b22;
-  --glow: rgba(6, 182, 212, 0.15);
+  --muted: #616e83;
+  --glow: rgba(2, 49, 57, 0.202);
 }
 
 /* ── Light theme ──────────────────────────────────────────────────────────── */
