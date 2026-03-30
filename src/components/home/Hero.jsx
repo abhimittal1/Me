@@ -67,7 +67,7 @@ function ProfileImage() {
       initial={{ opacity: 0, scale: 0.9, y: 30 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-      className="relative w-[160px] sm:w-[180px] md:w-[220px] lg:w-[300px]"
+      className="relative w-[160px] sm:w-[180px] md:w-[220px] lg:w-[301px]"
     >
       {/* Animated gradient ring behind */}
       <div className="absolute inset-0 -z-10 scale-110">
