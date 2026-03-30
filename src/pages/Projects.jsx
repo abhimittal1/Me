@@ -27,7 +27,10 @@ function GitHubStatsBar({ projects }) {
   const topLang = useMemo(() => {
     const freq = {};
     projects.forEach((p) => {
-      if (p.primaryLanguage) freq[p.primaryLanguage] = (freq[p.primaryLanguage] ?? 0) + 1;
+      // Count based on total language bytes across all repos for accuracy
+      Object.entries(p.languages ?? {}).forEach(([lang, bytes]) => {
+        freq[lang] = (freq[lang] ?? 0) + bytes;
+      });
     });
     return Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "—";
   }, [projects]);

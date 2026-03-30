@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { GitBranch, Code2, Zap, ArrowRight, Terminal, Layers, Cpu } from "lucide-react";
+import { Brain, Code2, Zap, ArrowRight, Layers } from "lucide-react";
 import { useRef } from "react";
 
 const inView = (delay = 0) => ({
@@ -10,28 +10,8 @@ const inView = (delay = 0) => ({
   transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1], delay },
 });
 
-function StatCard({ value, label, icon: Icon, delay }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
-      className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-[var(--card)] border border-[var(--border)] hover:border-[var(--primary)]/30 hover:shadow-lg hover:shadow-[var(--primary)]/5 transition-all duration-300"
-    >
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--primary)]/10">
-        <Icon size={18} className="text-[var(--primary)]" />
-      </div>
-      <span className="text-2xl font-display font-bold gradient-text leading-none">
-        {value}
-      </span>
-      <span className="text-xs text-[var(--muted)] font-medium">{label}</span>
-    </motion.div>
-  );
-}
-
 const HIGHLIGHTS = [
-  { icon: GitBranch, label: "Open Source", desc: "Active contributor" },
+  { icon: Brain, label: "AI / ML", desc: "LLMs & intelligent systems" },
   { icon: Code2, label: "Clean Code", desc: "SOLID & DRY principles" },
   { icon: Zap, label: "Fast Learner", desc: "New tech, no problem" },
 ];
@@ -51,12 +31,11 @@ function HighlightCard({ icon: Icon, label, desc, delay }) {
   );
 }
 
-// ─── Tech Stack Visual (replaces the image) ─────────────────────────────────
-function TechStackVisual() {
-  const techRows = [
-    ["React", "Node.js", "Python"],
-    ["TypeScript", "TailwindCSS", "PostgreSQL"],
-    ["Docker", "AWS", "Git"],
+// ─── Stats Visual (clean, simple) ────────────────────────────────────────────
+function StatsVisual() {
+  const stats = [
+    { value: process.env.REACT_APP_ABOUT_YEARS || "1+", label: "Years Experience" },
+    { value: process.env.REACT_APP_ABOUT_PROJECTS || "10+", label: "Projects Built" },
   ];
 
   return (
@@ -65,89 +44,64 @@ function TechStackVisual() {
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, amount: 0.3 }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className="relative"
+      className="relative flex flex-col gap-5"
     >
-      {/* Decorative ring */}
-      <div className="absolute -inset-4 rounded-3xl border border-[var(--primary)]/10" />
-      <div className="absolute -inset-8 rounded-[2rem] border border-[var(--accent)]/5" />
+      {/* Stats cards */}
+      <div className="grid grid-cols-2 gap-4">
+        {stats.map((stat, i) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, scale: 0.85 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 + i * 0.1, duration: 0.5 }}
+            className="flex flex-col items-center gap-2 p-6 rounded-2xl bg-[var(--card)] border border-[var(--border)] hover:border-[var(--primary)]/30 hover:shadow-lg hover:shadow-[var(--primary)]/5 transition-all duration-300"
+          >
+            <span className="text-3xl font-display font-bold gradient-text leading-none">
+              {stat.value}
+            </span>
+            <span className="text-xs text-[var(--muted)] font-medium text-center">{stat.label}</span>
+          </motion.div>
+        ))}
+      </div>
 
-      <div className="relative rounded-2xl border border-[var(--border)] bg-[var(--card)] overflow-hidden shadow-2xl shadow-black/20">
-        {/* Header */}
-        <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[var(--border)] bg-[var(--surface)]">
+      {/* Focus areas */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.4, duration: 0.5 }}
+        className="rounded-2xl bg-[var(--card)] border border-[var(--border)] p-5 flex flex-col gap-4"
+      >
+        <div className="flex items-center gap-2">
           <Layers size={14} className="text-[var(--primary)]" />
-          <span className="text-xs font-semibold text-[var(--text)]">Tech Stack</span>
-          <span className="text-[10px] text-[var(--muted)] ml-auto">experience.json</span>
+          <span className="text-xs font-semibold text-[var(--text)]">Focus Areas</span>
         </div>
-
-        {/* Stats row */}
-        <div className="grid grid-cols-3 gap-px bg-[var(--border)]">
-          <StatCard
-            value={process.env.REACT_APP_ABOUT_YEARS || "3+"}
-            label="Years Exp."
-            icon={Terminal}
-            delay={0.1}
-          />
-          <StatCard
-            value={process.env.REACT_APP_ABOUT_PROJECTS || "20+"}
-            label="Projects"
-            icon={Layers}
-            delay={0.2}
-          />
-          <StatCard
-            value="10+"
-            label="Technologies"
-            icon={Cpu}
-            delay={0.3}
-          />
-        </div>
-
-        {/* Tech grid */}
-        <div className="p-5 space-y-3">
-          {techRows.map((row, ri) => (
-            <motion.div
-              key={ri}
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4 + ri * 0.1, duration: 0.5 }}
-              className="flex gap-2"
+        <div className="flex flex-wrap gap-2">
+          {["AI / ML", "Python", "LLMs", "React", "Node.js", "REST APIs", "Full-Stack"].map((tech) => (
+            <span
+              key={tech}
+              className="px-3 py-2 rounded-xl text-xs font-medium bg-[var(--surface)] text-[var(--muted)] border border-[var(--border)] hover:border-[var(--primary)]/30 hover:text-[var(--primary)] transition-all duration-300"
             >
-              {row.map((tech) => (
-                <span
-                  key={tech}
-                  className="flex-1 px-3 py-2.5 rounded-xl text-xs font-medium text-center bg-[var(--surface)] text-[var(--muted)] border border-[var(--border)] hover:border-[var(--primary)]/30 hover:text-[var(--primary)] transition-all duration-300 cursor-default"
-                >
-                  {tech}
-                </span>
-              ))}
-            </motion.div>
+              {tech}
+            </span>
           ))}
         </div>
+      </motion.div>
 
-        {/* Activity bar */}
-        <div className="px-5 pb-5">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-[10px] text-[var(--muted)]">Activity</span>
-          </div>
-          <div className="flex gap-1">
-            {Array.from({ length: 20 }).map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ scaleY: 0 }}
-                whileInView={{ scaleY: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.6 + i * 0.03, duration: 0.3 }}
-                className="flex-1 rounded-sm origin-bottom"
-                style={{
-                  height: `${12 + Math.random() * 28}px`,
-                  backgroundColor: `var(--primary)`,
-                  opacity: 0.15 + Math.random() * 0.5,
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* Open to work badge */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.5, duration: 0.4 }}
+        className="flex items-center gap-3 px-5 py-3.5 rounded-2xl glass"
+      >
+        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+        <span className="text-sm font-medium text-[var(--text)]">
+          {process.env.REACT_APP_AVAILABILITY || "Open to opportunities"}
+        </span>
+      </motion.div>
     </motion.div>
   );
 }
@@ -169,10 +123,10 @@ export default function AboutPreview() {
 
       <motion.div
         style={{ y, opacity }}
-        className="relative z-10 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center"
+        className="relative z-10 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center"
       >
-        {/* Left: Tech Stack Visual */}
-        <TechStackVisual />
+        {/* Left: Stats Visual */}
+        <StatsVisual />
 
         {/* Right: text */}
         <div className="flex flex-col gap-7">
@@ -184,16 +138,16 @@ export default function AboutPreview() {
             {...inView(0.12)}
             className="font-display text-3xl md:text-4xl font-bold text-[var(--text)] leading-snug"
           >
-            Passionate about building{" "}
-            <span className="gradient-text">meaningful experiences</span>
+            Building intelligent{" "}
+            <span className="gradient-text">AI-powered solutions</span>
           </motion.h2>
 
           <motion.p {...inView(0.2)} className="text-[var(--muted)] leading-relaxed text-base">
-            {process.env.REACT_APP_ABOUT_BIO_1 || "I'm a full-stack developer with over 3 years of experience crafting scalable web applications. My stack centers on React, Node.js, and TypeScript — always with an eye for performance and accessibility."}
+            {process.env.REACT_APP_ABOUT_BIO_1 || "I'm an AI/ML engineer passionate about building intelligent systems that solve real problems — from LLM-powered tools to scalable full-stack applications."}
           </motion.p>
 
           <motion.p {...inView(0.27)} className="text-[var(--muted)] leading-relaxed text-base">
-            {process.env.REACT_APP_ABOUT_BIO_2 || "Outside of code I contribute to open-source projects, write technical articles, and mentor junior developers. I believe great software is built by curious, collaborative teams who care about the details."}
+            {process.env.REACT_APP_ABOUT_BIO_2 || "I focus on bridging the gap between AI research and real-world deployment, creating solutions that are technically sound, user-friendly, and production-ready."}
           </motion.p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
@@ -204,7 +158,7 @@ export default function AboutPreview() {
 
           <motion.div {...inView(0.55)}>
             <Link
-              to="/skills"
+              to="/about"
               className="group inline-flex items-center gap-2 px-7 py-3 rounded-2xl border border-[var(--primary)]/30 text-[var(--primary)] font-semibold text-sm hover:bg-[var(--primary)]/8 hover:shadow-lg hover:shadow-[var(--primary)]/10 transition-all duration-300"
             >
               More About Me

@@ -61,29 +61,6 @@ const CATEGORIES = [
       { emoji: "🪶", name: "SQLite" },
     ],
   },
-  {
-    key: "learning",
-    label: "Currently Learning",
-    icon: "🚀",
-    col: "col-span-12 md:col-span-3",
-    isLearning: true,
-    skills: [
-      { emoji: "🤖", name: "AI / LLMs", progress: 60 },
-      { emoji: "🦀", name: "Rust (deep)", progress: 40 },
-      { emoji: "☸️", name: "K8s advanced", progress: 30 },
-    ],
-  },
-];
-
-const TOOLS = [
-  { emoji: "💻", name: "VS Code" },
-  { emoji: "🐙", name: "Git" },
-  { emoji: "🐧", name: "Linux" },
-  { emoji: "🎨", name: "Figma" },
-  { emoji: "📮", name: "Postman" },
-  { emoji: "🧠", name: "Cursor" },
-  { emoji: "📦", name: "pnpm" },
-  { emoji: "🛡️", name: "Prettier" },
 ];
 
 function SkillPill({ emoji, name }) {
@@ -96,28 +73,6 @@ function SkillPill({ emoji, name }) {
       <span>{emoji}</span>
       <span>{name}</span>
     </motion.span>
-  );
-}
-
-function ProgressBar({ label, emoji, value }) {
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between text-xs">
-        <span className="flex items-center gap-1.5 text-[var(--text)] font-medium">
-          {emoji} {label}
-        </span>
-        <span className="text-[var(--muted)]">{value}%</span>
-      </div>
-      <div className="h-2 w-full rounded-full bg-[var(--surface)]">
-        <motion.div
-          className="h-full rounded-full bg-gradient-to-r from-[var(--primary)] to-[var(--accent)]"
-          initial={{ width: 0 }}
-          whileInView={{ width: `${value}%` }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-        />
-      </div>
-    </div>
   );
 }
 
@@ -135,19 +90,11 @@ function BentoCard({ category, delay }) {
         <h3 className="font-display font-semibold text-[var(--text)] text-sm">{category.label}</h3>
       </div>
 
-      {category.isLearning ? (
-        <div className="flex flex-col gap-5 flex-1 justify-center">
-          {category.skills.map((s) => (
-            <ProgressBar key={s.name} label={s.name} emoji={s.emoji} value={s.progress} />
-          ))}
-        </div>
-      ) : (
-        <div className="flex flex-wrap gap-2">
-          {category.skills.map((s) => (
-            <SkillPill key={s.name} emoji={s.emoji} name={s.name} />
-          ))}
-        </div>
-      )}
+      <div className="flex flex-wrap gap-2">
+        {category.skills.map((s) => (
+          <SkillPill key={s.name} emoji={s.emoji} name={s.name} />
+        ))}
+      </div>
     </motion.div>
   );
 }
@@ -293,35 +240,6 @@ export default function Skills() {
           {CATEGORIES.map((cat, i) => (
             <BentoCard key={cat.key} category={cat} delay={i * 0.07} />
           ))}
-        </div>
-
-        {/* Tools */}
-        <div className="flex flex-col gap-6">
-          <motion.h2
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="font-display text-xl font-semibold text-[var(--text)]"
-          >
-            Tools I Use Daily
-          </motion.h2>
-          <div className="grid grid-cols-2 xs:grid-cols-4 sm:grid-cols-8 gap-4">
-            {TOOLS.map((tool, i) => (
-              <motion.div
-                key={tool.name}
-                initial={{ opacity: 0, scale: 0.85 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.35, delay: i * 0.05 }}
-                whileHover={{ y: -5, scale: 1.05 }}
-                className="flex flex-col items-center gap-2.5 py-5 rounded-2xl bg-[var(--card)] border border-[var(--border)] hover:border-[var(--primary)]/25 hover:shadow-lg hover:shadow-[var(--primary)]/5 transition-all duration-300 cursor-default"
-              >
-                <span className="text-3xl">{tool.emoji}</span>
-                <span className="text-[10px] text-[var(--muted)] text-center leading-tight font-medium">{tool.name}</span>
-              </motion.div>
-            ))}
-          </div>
         </div>
 
         {/* Contribution graph */}

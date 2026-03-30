@@ -290,33 +290,6 @@ export default function About() {
           </motion.p>
         </div>
 
-        {/* Education */}
-        <div className="flex flex-col gap-8">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="flex flex-col gap-2"
-          >
-            <div className="flex items-center gap-2">
-              <GraduationCap size={16} className="text-[var(--primary)]" />
-              <span className="text-sm font-semibold tracking-[0.2em] uppercase text-[var(--primary)]">
-                Education
-              </span>
-            </div>
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-[var(--text)]">
-              Academic Background
-            </h2>
-          </motion.div>
-
-          <div className="flex flex-col">
-            {EDUCATION.map((item, i) => (
-              <EduCard key={item.id} item={item} index={i} isLast={i === EDUCATION.length - 1} />
-            ))}
-          </div>
-        </div>
-
         {/* Experience */}
         <div className="flex flex-col gap-8">
           <motion.div
@@ -340,6 +313,33 @@ export default function About() {
           <div className="flex flex-col gap-4">
             {EXPERIENCE.map((item, i) => (
               <ExpCard key={item.id} item={item} index={i} isOpen={openExp === item.id} toggle={() => toggle(item.id)} />
+            ))}
+          </div>
+        </div>
+            
+        {/* Education */}
+        <div className="flex flex-col gap-8">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="flex flex-col gap-2"
+          >
+            <div className="flex items-center gap-2">
+              <GraduationCap size={16} className="text-[var(--primary)]" />
+              <span className="text-sm font-semibold tracking-[0.2em] uppercase text-[var(--primary)]">
+                Education
+              </span>
+            </div>
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-[var(--text)]">
+              Academic Background
+            </h2>
+          </motion.div>
+
+          <div className="flex flex-col">
+            {EDUCATION.map((item, i) => (
+              <EduCard key={item.id} item={item} index={i} isLast={i === EDUCATION.length - 1} />
             ))}
           </div>
         </div>
