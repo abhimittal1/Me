@@ -71,7 +71,7 @@ function ProfileImage() {
     >
       {/* Animated gradient ring behind */}
       <div className="absolute inset-0 -z-10 scale-110">
-        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[var(--primary)] via-[var(--accent)] to-[var(--primary)] animate-[spin_8s_linear_infinite] blur-2xl opacity-20" />
+        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[var(--primary)] via-[var(--accent)] to-[var(--primary)] animate-[spin_8s_linear_infinite] blur-2xl opacity-21" />
       </div>
 
       {/* Image container */}
