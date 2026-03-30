@@ -117,7 +117,7 @@ export default function AboutPreview() {
   const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
 
   return (
-    <section ref={ref} className="relative py-28 px-5 md:px-10 lg:px-20 overflow-hidden">
+    <section ref={ref} className="relative py-9 sm:py-16 md:py-20 lg:py-28 px-5 md:px-10 lg:px-20 overflow-hidden">
       {/* Subtle gradient transition from Hero */}
       <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-[var(--bg)] to-transparent pointer-events-none" />
 

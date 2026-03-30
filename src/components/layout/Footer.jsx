@@ -80,7 +80,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative mt-24 bg-[var(--surface)]/50 text-[var(--text)]">
+    <footer className="relative mt-5 bg-[var(--surface)]/50 text-[var(--text)]">
       {/* Top gradient line */}
       <div
         className="absolute top-0 inset-x-0 h-px"

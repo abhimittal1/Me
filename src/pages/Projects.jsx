@@ -24,16 +24,9 @@ function StatPill({ icon: Icon, label, value }) {
 
 function GitHubStatsBar({ projects }) {
   const totalStars = projects.reduce((s, p) => s + p.stars, 0);
-  const topLang = useMemo(() => {
-    const freq = {};
-    projects.forEach((p) => {
-      // Count based on total language bytes across all repos for accuracy
-      Object.entries(p.languages ?? {}).forEach(([lang, bytes]) => {
-        freq[lang] = (freq[lang] ?? 0) + bytes;
-      });
-    });
-    return Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "—";
-  }, [projects]);
+
+  // Hard-coded to Python as top language
+  const topLang = "Python";
 
   return (
     <motion.div
