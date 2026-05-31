@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { Brain, Code2, Zap, ArrowRight, Layers } from "lucide-react";
-import { useRef } from "react";
 
 const inView = (delay = 0) => ({
   initial: { opacity: 0, y: 36 },
@@ -108,23 +107,10 @@ function StatsVisual() {
 
 // ─── AboutPreview ─────────────────────────────────────────────────────────────
 export default function AboutPreview() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const y = useTransform(scrollYProgress, [0, 1], [60, -60]);
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-
   return (
-    <section ref={ref} className="relative py-9 sm:py-16 md:py-20 lg:py-28 px-5 md:px-10 lg:px-20 overflow-hidden">
-      {/* Subtle gradient transition from Hero */}
-      <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-[var(--bg)] to-transparent pointer-events-none" />
+    <section className="relative py-9 sm:py-16 md:py-20 lg:py-28 px-5 md:px-10 lg:px-20 overflow-hidden">
 
-      <motion.div
-        style={{ y, opacity }}
-        className="relative z-10 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center"
-      >
+      <div className="relative z-10 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
         {/* Left: Stats Visual */}
         <StatsVisual />
 
@@ -166,7 +152,7 @@ export default function AboutPreview() {
             </Link>
           </motion.div>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }

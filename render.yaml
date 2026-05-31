@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: abhishek-chatbot-api
+    runtime: python
+    buildCommand: pip install -r requirements_api.txt
+    startCommand: uvicorn chatbot_api:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: NOTIFY_EMAIL
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false          # set to your Vercel URL, e.g. https://your-app.vercel.app

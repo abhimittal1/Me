@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { motion, useScroll, useSpring, AnimatePresence } from "framer-motion";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import ChatWidget from "../ui/ChatWidget";
 
 const pageVariants = {
   initial: { opacity: 0, y: 16 },
@@ -72,7 +73,7 @@ export default function Layout() {
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             aria-label="Back to top"
-            className="fixed bottom-8 right-8 z-50 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] text-white shadow-xl shadow-[var(--primary)]/25 hover:shadow-2xl hover:shadow-[var(--primary)]/30 hover:scale-110 transition-all duration-300"
+            className="fixed bottom-8 right-24 z-50 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] text-white shadow-xl shadow-[var(--primary)]/25 hover:shadow-2xl hover:shadow-[var(--primary)]/30 hover:scale-110 transition-all duration-300"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -89,6 +90,8 @@ export default function Layout() {
           </motion.button>
         )}
       </AnimatePresence>
+
+      <ChatWidget />
     </div>
   );
 }
