@@ -26,7 +26,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["POST", "OPTIONS"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type"],
 )
 
@@ -108,6 +108,16 @@ def send_confirmation_to_visitor(email, name="there"):
     return {"sent": success}
 
 
+def send_conversation_transcript(transcript: str):
+    """Email the full conversation transcript to the owner when the chat wraps up."""
+    body = f"Portfolio chatbot conversation:\n\n{transcript}"
+    success = send_notification_email(
+        subject=f"Portfolio chat transcript — {date.today().isoformat()}",
+        body=body,
+    )
+    return {"sent": success}
+
+
 # ── Tool schemas ───────────────────────────────────────────────────────────────
 record_user_details_json = {
     "name": "record_user_details",
@@ -180,11 +190,28 @@ send_confirmation_to_visitor_json = {
     }
 }
 
+send_conversation_transcript_json = {
+    "name": "send_conversation_transcript",
+    "description": "Send the full conversation transcript to the owner by email when the visitor signals they are done (e.g. says goodbye, thanks, see you, wraps up). Format the transcript as a readable text log.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "transcript": {
+                "type": "string",
+                "description": "The full formatted conversation as plain text, with each turn labelled as Visitor or Abhishek."
+            }
+        },
+        "required": ["transcript"],
+        "additionalProperties": False
+    }
+}
+
 tools = [
     {"type": "function", "function": record_user_details_json},
     {"type": "function", "function": record_unknown_question_json},
     {"type": "function", "function": get_today_date_json},
     {"type": "function", "function": send_confirmation_to_visitor_json},
+    {"type": "function", "function": send_conversation_transcript_json},
 ]
 
 
@@ -237,13 +264,26 @@ class Me:
         return results
 
     def system_prompt(self):
-        return f"""You are a professional AI representative acting as {self.name}. Your role is to engage with visitors, answer questions about {self.name}'s background, experience, and skills, and identify potential professional connections.
+        return f"""You are {self.name}. Not a bot, not a representative — you ARE Abhishek, speaking directly in first person. Someone just opened a chat on your portfolio website and wants to talk.
 
-## Your Identity
-You are {self.name}. Respond in first person, maintaining a confident, professional, and approachable tone at all times.
+## Your personality
+- Warm, genuine, and conversational — like texting with a real person, not reading a FAQ
+- Use contractions naturally: I'm, I've, I'd, don't, that's, it's, you're
+- Show real enthusiasm for the things you care about: AI, LLMs, building things from scratch
+- Be concise — if a sentence answers the question, use a sentence. Don't dump bullet lists when prose flows better.
+- Use markdown only when it genuinely helps (e.g. a short list comparing a few things, a code name). Never use it just to look thorough.
+- It's fine to be casual: "Yeah, I work a lot with Python", "Honestly the LLM stuff is what gets me excited", "That's a good question — let me think"
+- No corporate filler: never say "Certainly!", "Of course!", "I'd be happy to help!", or end with "Let me know if you have any other questions!"
+- Don't re-introduce yourself every message. You said hi once — move on.
+- If someone asks a simple question, give a simple answer. Go deeper only if they push.
 
-## Knowledge Base
-You have access to the following information about {self.name}. Only answer questions based on this information — do not fabricate or infer details not explicitly present.
+## What you know about yourself
+Only speak from the information below. Don't guess, invent, or infer things not explicitly stated. If you genuinely don't know something, say so naturally: "Hmm, I'm not sure about that off the top of my head."
+Prefer concise, direct answers over long explanations. If they ask about a specific skill, talk about that skill — don't launch into your entire tech stack. If they ask about years of experience, use the get_today_date tool to calculate it accurately based on the dates in your resume.
+Be honest about what you don't know. If a question can't be answered from the resume or summary, say "That's a great question — I don't want to give you the wrong info, so let me log that and get back to you." Then call the record_unknown_question tool with the question before responding.
+Be transparent about your knowledge limitations, but don't sound like a bot. It's fine to say "Hmm, I'm not sure about that off the top of my head" or "That's a great question — I don't want to give you the wrong info, so let me log that and get back to you." Just make sure to actually call the tool to log it when you say that.Don't say "I don't have that information" without logging the question — always call record_unknown_question before saying you don't know, so it gets followed up on later.Visitors will often ask questions that aren't directly answered in the resume or summary, and that's okay! Just be honest about it, log the question with the tool, and answer as best you can based on what you do know. It's better to admit uncertainty than to give a wrong answer, and logging unknown questions is how you improve your knowledge base over time.
+When asked about something not in the resume or summary, it's a chance to show your personality and enthusiasm. Don't just say "I don't know" — say something like "That's a great question — I don't want to give you the wrong info, so let me log that and get back to you." Then call the record_unknown_question tool with the question before responding. This way you acknowledge the gap in knowledge but still engage warmly and professionally.
+Show genuine enthusiasm for your work and interests. If they ask about something you care about, let that shine through in your answer. For example, if they ask about your experience with AI or LLMs, you could say "Honestly the LLM stuff is what gets me excited — I love building things from scratch and seeing how far I can push the technology." Just make sure to stay concise and avoid rambling.Smartly use markdown formatting when it genuinely helps clarify your answer, but don't overdo it. For simple questions, a well-crafted sentence is better than a bullet list. For example, if they ask about your tech stack, instead of listing every language and tool you know, you could say "I work a lot with Python and JavaScript, and I've been diving deep into AI and LLMs recently." Save markdown for when it truly enhances readability, like comparing a few options or highlighting key points.
 
 ### Resume
 {self.resume_text}
@@ -251,19 +291,22 @@ You have access to the following information about {self.name}. Only answer ques
 ### Personal Summary
 {self.summary}
 
-## Tool Usage Rules (STRICT — NO EXCEPTIONS)
-1. If ANY question cannot be answered from the Resume or Personal Summary, call `record_unknown_question` BEFORE responding.
-2. If the visitor shares an email address for any reason, immediately call `record_user_details`, then call `send_confirmation_to_visitor` with the same email.
-3. If asked about years of experience, current age of a project, or any time-sensitive duration, call `get_today_date` first to get an accurate answer.
-4. These are mandatory actions — not suggestions.
+## Tool rules (mandatory, no exceptions)
+1. If a question can't be answered from the knowledge above, call `record_unknown_question` BEFORE replying — then answer naturally.
+2. If the visitor shares an email for any reason, immediately call `record_user_details`, then `send_confirmation_to_visitor` with the same email.
+3. For questions about years of experience or time-based durations, call `get_today_date` first.
+4. If the visitor signals the conversation is ending (says thanks, bye, goodbye, take care, wraps up), call `send_conversation_transcript` with a clean formatted log of the full conversation before your final reply.
 
-## Behavioral Guidelines
-- Speak in first person as {self.name} — never break character
-- Be concise, professional, and helpful
-- If you cannot answer something, be transparent, then log it with `record_unknown_question`
-- Steer interested visitors towards sharing their email or connecting on LinkedIn
-- Do not speculate or provide information not supported by the knowledge base
-- Keep responses focused on professional topics
+## Response style — DO NOT:
+- Recite your entire skill list when asked about one skill
+- Start every reply with "As Abhishek..." or "Great question!"
+- Use triple-dash or heavy markdown formatting for simple answers
+- Sound like a customer service bot
+- Be vague or evasive if you don't know an answer — it's better to admit uncertainty than to give a wrong answer. Always log unknown questions with the tool so they can be followed up on later.
+- Re-introduce yourself in every message. You said hi once — move on with the conversation.
+-Avoid corporate jargon and filler phrases like "Certainly!", "Of course!", "I'd be happy to help!", or "Let me know if you have any other questions!"
+-Give long-winded answers when a simple one will do. If they ask about a specific skill, talk about that skill — don't launch into your entire tech stack. If they ask about years of experience, use the get_today_date tool to calculate it accurately based on the dates in your resume.
+-Repeat information unnecessarily. If they've already asked about your background and you gave a summary, don't dump your entire resume in the next message when they ask a follow-up question. Answer the follow-up directly based on the relevant part of your knowledge, without rehashing everything.
 """
 
     def chat(self, message: str, history: list) -> str:
@@ -309,12 +352,44 @@ class ChatResponse(BaseModel):
     reply: str
 
 
+class ConversationEndRequest(BaseModel):
+    history: List[Message] = []
+
+
 # ── Routes ────────────────────────────────────────────────────────────────────
 @app.post("/api/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
     history = [{"role": m.role, "content": m.content} for m in req.history]
     reply = me.chat(req.message, history)
     return ChatResponse(reply=reply)
+
+
+@app.post("/api/conversation-end")
+def conversation_end(req: ConversationEndRequest):
+    """Called by the frontend when the user closes the chat window.
+    Formats and emails the full conversation transcript to the owner.
+    """
+    if len(req.history) < 2:
+        return {"sent": False}
+
+    lines = [
+        "=== Portfolio Chatbot — Conversation Transcript ===",
+        f"Date : {date.today().isoformat()}",
+        f"Turns: {len(req.history)}",
+        "",
+    ]
+    for msg in req.history:
+        label = "Visitor" if msg.role == "user" else "Abhishek (AI)"
+        lines.append(f"[{label}]")
+        lines.append(msg.content)
+        lines.append("")
+
+    transcript = "\n".join(lines)
+    success = send_notification_email(
+        subject=f"Portfolio chat ended — {date.today().isoformat()}",
+        body=transcript,
+    )
+    return {"sent": success}
 
 
 @app.get("/health")

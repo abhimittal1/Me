@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send, Bot, User } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 const API_BASE =
   process.env.REACT_APP_CHATBOT_API_URL || "http://localhost:8000";
@@ -8,7 +9,7 @@ const API_BASE =
 const WELCOME = {
   role: "assistant",
   content:
-    "Hi! I'm Abhishek's AI assistant. Ask me anything about his background, skills, projects, or experience — I'm here to help!",
+    "Hey! I'm Abhishek — ask me anything about my work, projects, skills, or background. Happy to chat!",
 };
 
 // ── Typing dots ───────────────────────────────────────────────────────────────
@@ -58,13 +59,34 @@ function MessageBubble({ msg, index }) {
       {/* Bubble */}
       <div
         className={[
-          "px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap break-words",
+          "px-4 py-2.5 text-sm leading-relaxed break-words",
           isUser
             ? "rounded-2xl rounded-br-sm bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] text-white shadow-md shadow-[var(--primary)]/20"
             : "rounded-2xl rounded-bl-sm bg-[var(--card)] border border-[var(--border)] text-[var(--text)]",
         ].join(" ")}
       >
-        {msg.content}
+        {isUser ? (
+          msg.content
+        ) : (
+          <ReactMarkdown
+            components={{
+              p: ({ children }) => <p className="mb-1 last:mb-0">{children}</p>,
+              strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+              em: ({ children }) => <em className="italic">{children}</em>,
+              code: ({ inline, children }) =>
+                inline ? (
+                  <code className="px-1 py-0.5 rounded text-xs bg-black/10 dark:bg-white/10 font-mono">{children}</code>
+                ) : (
+                  <pre className="mt-1 p-2 rounded-lg bg-black/10 text-xs font-mono overflow-x-auto"><code>{children}</code></pre>
+                ),
+              ul: ({ children }) => <ul className="list-disc pl-4 my-1 space-y-0.5">{children}</ul>,
+              ol: ({ children }) => <ol className="list-decimal pl-4 my-1 space-y-0.5">{children}</ol>,
+              li: ({ children }) => <li>{children}</li>,
+            }}
+          >
+            {msg.content}
+          </ReactMarkdown>
+        )}
       </div>
     </motion.div>
   );
@@ -140,6 +162,20 @@ export default function ChatWidget() {
     }
   }, [input, isLoading, messages, isOpen]);
 
+  const handleClose = useCallback(() => {
+    const realMsgs = messages.slice(1); // exclude welcome message
+    if (realMsgs.length > 0) {
+      fetch(`${API_BASE}/api/conversation-end`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          history: realMsgs.map(({ role, content }) => ({ role, content })),
+        }),
+      }).catch(() => {});
+    }
+    setIsOpen(false);
+  }, [messages]);
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -175,7 +211,7 @@ export default function ChatWidget() {
                 </span>
                 <div>
                   <p className="text-sm font-semibold text-white leading-none">
-                    Abhishek's Assistant
+                    Abhishek Mittal
                   </p>
                   <p className="text-[11px] text-white/70 mt-0.5 flex items-center gap-1">
                     <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-300 animate-pulse" />
@@ -184,7 +220,7 @@ export default function ChatWidget() {
                 </div>
               </div>
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={handleClose}
                 aria-label="Close chat"
                 className="flex h-8 w-8 items-center justify-center rounded-xl text-white/80 hover:text-white hover:bg-white/15 transition-all duration-200"
               >
